@@ -1,0 +1,15 @@
+{
+    "name": "dwalker109/countdown",
+    "description": "Simple countdown solver",
+    "require": {
+        "silex/silex": "~1.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dan Walker",
+            "email": "dwalker109@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
