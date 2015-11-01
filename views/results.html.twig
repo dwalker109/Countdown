@@ -1,0 +1,51 @@
+{% extends 'layout.html.twig' %}
+{% block body %}
+
+	<div class="row">
+
+		<div class="col-xs-12">
+			<p><a href='/'>&larr; Upload another CSV</a></p>
+		</div>
+
+		{% if results %}
+
+			{% for result in results %}
+
+				<div class="col-md-4">
+
+					<div class="well">
+
+						<h3>Target Result: {{ result.problem.target }}</h3>
+						<h3>Source Numbers: {{ result.problem.numbers_str }}</h3>
+
+						{% if result.expressions %}
+
+							<h3>Postfix</h3>
+							<ul>
+
+								{% for expression in result.expressions %}
+									<li>{{ expression }}</li>
+								{% endfor %}
+							</ul>
+
+						{% else %}
+
+							<h3 class="error">Unsolveable</h3>
+
+						{% endif %}
+
+					</div>
+
+				</div>
+
+			{% endfor %}
+
+		{% else %}
+
+			<h2>No results found</h2>
+
+		{% endif %}
+
+	</div>
+
+{% endblock body %}
