@@ -6,6 +6,7 @@ class Solver
     private $numbers;
     private $target;
     private $rpn_equations;
+    private $results;
 
 
     public function __construct(Array $numbers, $target)
@@ -13,6 +14,7 @@ class Solver
         $this->numbers = $numbers;
         $this->target = $target;
         $this->rpn_equations = null;
+        $this->results = null;
     }
 
 
@@ -22,23 +24,33 @@ class Solver
      */
     public function run()
     {
-        $winners = [];
-
         // Generate the RPN expressions to allow brute force calculations
-        $this->buildRpnEquations($this->numbers);
+        $this->buildRpnExpressions($this->numbers);
 
-        // Carry out each calculation, recording the winners
+        // Generate RPN equation results, then return them
+        $this->calculateResults();
+        return $this->results;
+    }
+
+
+    /**
+     * Calculate all available RPN equations and store the results
+     */
+    private function calculateResults()
+    {
+        // Iterate all available equations and store winners locally
+        $local_results = [];
         foreach ($this->rpn_equations as $rpn) {
             if (Rpn::calculate($rpn) === $this->target) {
-                $winners[] = [
+                $local_results[] = [
                     'rpn' => $rpn,
                     'ifx' => Rpn::ConvertRpnToIfx($rpn),
                 ];
             }
         }
 
-        // Return successful equations, or boolean false if no results
-        return $winners ?: false;
+        // Store winners in object, or false if there are none
+        $this->results = $local_results ?: false;
     }
 
 
@@ -50,31 +62,33 @@ class Solver
     * @param  int $level
     * @param  string $equation
     */
-    private function buildRpnEquations(Array $numbers, $level = 0, $equation = null)
+    private function buildRpnExpressions(Array $numbers, $level = 0, $equation = null)
     {
-        // At least two operands deep, iterate and append each operator to this tree
+        // At least two operands deep, so iterate and append each
+        // operator to this tree in a recursive call to this method
         if ($level >= 2) {
             foreach (Rpn::$operators as $operator) {
-                $this->buildRpnEquations($numbers, $level - 1, $equation . Rpn::OP_TOK . $operator);
+                $this->buildRpnExpressions($numbers, $level - 1, $equation . Rpn::OP_TOK . $operator);
             }
         }
 
-        // Iterate all source numbers once per tree
+        // Iterate all source numbers once per tree - pass by ref so the current number can
+        // be nullifed prior to the pool of numbers being used in the recursive call
         $all_used = true;
-        for ($i = 0; $i < count($numbers); $i++) {
-            if ($numbers[$i]) {
-                // Flag that all numbers have not been used, iterate further down this tree
-                // after removing current number from available pool and incrementing depth
+        foreach ($numbers as &$number) {
+            if ($number !== null) {
+                // Flag that all numbers have not been used, then iterate further down this tree
+                // after nullifying current number in the passed pool, while incrementing depth
                 $all_used = false;
-                $n = $numbers[$i];
-                $numbers[$i] = null;
-                $this->buildRpnEquations($numbers, $level + 1, $equation . Rpn::OP_TOK . $n);
+                $n = $number;
+                $number = null;
+                $this->buildRpnExpressions($numbers, $level + 1, $equation . Rpn::OP_TOK . $n);
                 // Restore current number for use with next iteration's tree
-                $numbers[$i] = $n;
+                $number = $n;
             }
         }
 
-        // No numbers were left and level is 1, this tree is complete
+        // No numbers were left this time around and level is 1, so this tree is complete - store it
         if ($all_used && $level == 1) {
             $this->rpn_equations[] = trim($equation);
         }

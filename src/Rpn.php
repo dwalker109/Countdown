@@ -65,13 +65,13 @@ class Rpn
 
     /**
      * Convert an RPN expression into a "normal" infix one
-     * @param  string $expression
+     * @param  Array|string $expression
      * @return string
      */
     public static function convertRpnToIfx($expression)
     {
-        // Tokenize RPN expression, and create a new stack for the result
-        $rpn_array = explode(self::OP_TOK, $expression);
+        // Tokenize RPN expression if required, and create a new stack for the result
+        $rpn_array = is_array($expression) ?: explode(self::OP_TOK, trim($expression));
         $ifx_stack = new \SplStack();
 
         // Iterate
