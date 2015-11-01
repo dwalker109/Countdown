@@ -7,14 +7,16 @@ class Solver
     private $target;
     private $rpn_equations;
     private $results;
+    private $max_matches;
 
 
-    public function __construct(Array $numbers, $target)
+    public function __construct(Array $numbers, $target, $max_matches)
     {
         $this->numbers = $numbers;
         $this->target = $target;
-        $this->rpn_equations = null;
-        $this->results = null;
+        $this->max_matches = $max_matches;
+        $this->rpn_equations = [];
+        $this->results = [];
     }
 
 
@@ -24,11 +26,15 @@ class Solver
      */
     public function run()
     {
-        // Generate the RPN expressions to allow brute force calculations
-        $this->buildRpnExpressions($this->numbers);
+        // Turn off PHP time limit
+        set_time_limit(0);
 
-        // Generate RPN equation results, then return them
+        // Generate the RPN expressions to allow brute force calculations,
+        // then run these calculations
+        $this->buildRpnExpressions($this->numbers);
         $this->calculateResults();
+
+        // Return the results
         return $this->results;
     }
 
@@ -38,19 +44,21 @@ class Solver
      */
     private function calculateResults()
     {
-        // Iterate all available equations and store winners locally
-        $local_results = [];
+        // Iterate all available equations and store winners
         foreach ($this->rpn_equations as $rpn) {
             if (Rpn::calculate($rpn) === $this->target) {
-                $local_results[] = [
+                $this->results[] = [
                     'rpn' => $rpn,
                     'ifx' => Rpn::ConvertRpnToIfx($rpn),
                 ];
             }
-        }
 
-        // Store winners in object, or false if there are none
-        $this->results = $local_results ?: false;
+            // Return after the maximum allowed matches
+            if ($this->max_matches &&
+                    count($this->results) > $this->max_matches) {
+                return;
+            }
+        }
     }
 
 

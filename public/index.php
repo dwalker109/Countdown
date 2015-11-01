@@ -27,6 +27,9 @@ $app->post('/', function (Request $request) use ($app) {
     $data_to_process = [];
     $results = [];
 
+    // Stop calculating after this many successful matches - too high and RAM will run out
+    $max_matches = 10;
+
     // Retrieve the uploaded CSV and move the contents
     $csv = $request->files->get('csv');
 
@@ -59,7 +62,7 @@ $app->post('/', function (Request $request) use ($app) {
 
     // Solve the problem(s)
     foreach ($data_to_process as $problem) {
-        $solver = new dwalker109\Countdown\Solver($problem['numbers'], $problem['target']);
+        $solver = new dwalker109\Countdown\Solver($problem['numbers'], $problem['target'], $max_matches);
         $results[] = [
             'problem' => $problem,
             'expressions' => $solver->run(),
@@ -69,7 +72,7 @@ $app->post('/', function (Request $request) use ($app) {
     // Render
     return $app['twig']->render(
         'results.html.twig',
-        compact('results')
+        compact('results', 'max_matches')
     );
 });
 
