@@ -8,17 +8,6 @@ class Solver
     private $rpn_equations;
 
 
-    // Setup mathematical operators
-    const OP_TOK = ' ';
-    const OP_ADD = '+';
-    const OP_SUB = '-';
-    const OP_MUL = '*';
-    const OP_DIV = '/';
-    private $operators = [
-        self::OP_ADD, self::OP_SUB, self::OP_MUL, self::OP_DIV
-    ];
-
-
     public function __construct(Array $numbers, $target)
     {
         $this->numbers = $numbers;
@@ -43,7 +32,7 @@ class Solver
             if (Rpn::calculate($rpn) === $this->target) {
                 $winners[] = [
                     'rpn' => $rpn,
-                    'ifx' => Rpn::ConvertRpnToStd($rpn),
+                    'ifx' => Rpn::ConvertRpnToIfx($rpn),
                 ];
             }
         }
@@ -55,7 +44,7 @@ class Solver
 
     /**
     * Build RPN equation strings for all permutations of the source numbers
-    * (adapted from a Java example found at the URL below)
+    * (adapted from a Java example from the URL below)
     * @link   http://stackoverflow.com/a/2394972
     * @param  Array $numbers
     * @param  int $level
@@ -64,8 +53,8 @@ class Solver
     private function buildRpnEquations(Array $numbers, $level = 0, $equation = null)
     {
         if ($level >= 2) {
-            foreach ($this->operators as $operator) {
-                $this->buildRpnEquations($numbers, $level - 1, $equation . self::OP_TOK . $operator);
+            foreach (Rpn::$operators as $operator) {
+                $this->buildRpnEquations($numbers, $level - 1, $equation . Rpn::OP_TOK . $operator);
             }
         }
 
@@ -76,7 +65,7 @@ class Solver
                 $all_used = false;
                 $n = $numbers[$i];
                 $numbers[$i] = null;
-                $this->buildRpnEquations($numbers, $level + 1, $equation . self::OP_TOK . $n);
+                $this->buildRpnEquations($numbers, $level + 1, $equation . Rpn::OP_TOK . $n);
                 $numbers[$i] = $n;
             }
         }

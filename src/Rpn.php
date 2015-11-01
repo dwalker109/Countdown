@@ -2,6 +2,16 @@
 
 class Rpn
 {
+    // Setup mathematical operators
+    const OP_TOK = ' ';
+    const OP_ADD = '+';
+    const OP_SUB = '-';
+    const OP_MUL = '*';
+    const OP_DIV = '/';
+    public static $operators = [
+        self::OP_ADD, self::OP_SUB, self::OP_MUL, self::OP_DIV
+    ];
+
 
     /**
      * Evaluates an RPN (postfix) expression - only supports integer numbers
@@ -15,7 +25,7 @@ class Rpn
         // Ensure expression is an array and remove any invalid values, to
         // guarantee we are working on only numbers and operators later (this
         // ensures that use of eval() is safe)
-        $expression = is_array($expression) ? $expression : explode(' ', $expression);
+        $expression = is_array($expression) ? $expression : explode(self::OP_TOK, $expression);
         $expression = array_filter($expression, function ($value) {
             return preg_match('/[\+\-\/\*]|[\d]+/', $value) === 1 ? true : false;
         });
@@ -58,10 +68,10 @@ class Rpn
      * @param  string $expression
      * @return string
      */
-    public static function convertRpnToStd($expression)
+    public static function convertRpnToIfx($expression)
     {
         // Tokenize RPN expression, and create a new stack for the result
-        $rpn_array = explode(' ', $expression);
+        $rpn_array = explode(self::OP_TOK, $expression);
         $ifx_stack = new \SplStack();
 
         // Iterate

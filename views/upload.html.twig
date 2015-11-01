@@ -1,20 +1,46 @@
 {% extends 'layout.html.twig' %}
 {% block body %}
 
-<p>Upload a CSV file containing one or more rows of integer numbers.
-Enter the target number in the final column of the row.</p>
+<div class="col-sm-6">
 
-<form enctype="multipart/form-data" action="" method="POST">
-
-    <input type="hidden" name="MAX_FILE_SIZE" value="52428800" />
-
-    <div class="form-group">
-    	<label for="csv">File to upload</label>
-	    <input class="form-control" name="csv" type="file">
+	<div class="alert alert-info">
+		<p>Upload a CSV file containing one or more rows of integer numbers.
+		<b>Enter the target number in the final column of each row.</b></p>
+		<p><a href="/csv_sample.csv" target="_blank">Download a sample CSV file</a></p>
 	</div>
 
-    <input type="submit" class="btn btn-primary" value="Upload" />
+</div>
 
-</form>
+<div class="col-sm-6">
+
+	<form enctype="multipart/form-data" action="" method="POST" class="form-inline">
+
+	    <input type="hidden" name="MAX_FILE_SIZE" value="52428800" />
+
+	    <div class="form-group">
+	    	<label for="csv">File to upload</label>
+		    <input class="form-control" name="csv" type="file">
+		    <input type="submit" class="btn btn-primary" value="Upload" id="submit">
+		</div>
+
+
+	</form>
+
+</div>
+
+<!-- Tiny bit of inline script for UI - would seperate on a real project -->
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="/jquery.blockUI.js"></script>
+<script>
+	$(document).ready(function() { 
+		$('#submit').click(function(){
+			$.blockUI({ message: $('#pleaseWait') });
+		})
+	});
+</script>
+<div id="pleaseWait" style="display:none; padding-top:10px;">
+	<img src="/spinner.gif">
+	<p>Calculting results - this could take a little while...</p>
+</div>
 
 {% endblock body %}
