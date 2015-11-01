@@ -46,13 +46,15 @@ $app->post('/', function (Request $request) use ($app) {
     // Read the CSV data and iterate each line to ready for processing
     if (($handle = fopen($csv->getRealPath(), "r")) !== false) {
         while (($data = fgetcsv($handle)) !== false) {
-            // Cast all data to integers, seperate the final value (target)
+            // Cast all data to integers, seperate the final value (target), keep a display string
+            // version of the source numbers as well
             $numbers = array_map('intval', $data);
-            $numbers_str = implode(', ', $numbers);
             $target = array_pop($numbers);
+            $numbers_str = implode(', ', $numbers);
             $data_to_process[] = compact('numbers', 'target', 'numbers_str');
         }
         fclose($handle);
+        unlink($csv->getRealPath());
     }
 
     // Solve the problem(s)

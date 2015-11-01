@@ -4,7 +4,7 @@ class Rpn
 {
 
     /**
-     * Evaluates an RPN (postfix) expression - POC, only supports integer numbers
+     * Evaluates an RPN (postfix) expression - only supports integer numbers
      * and +, -, * and / operators, tokens must be seperated with spaces
      * @param  string|Array $expression
      * @param  integer $target
@@ -50,5 +50,34 @@ class Rpn
 
         // Finished, return the top of the stack
         return (int) $rpn_stack->top();
+    }
+
+
+    /**
+     * Convert an RPN expression into a "normal" infix one
+     * @param  string $expression
+     * @return string
+     */
+    public static function convertRpnToStd($expression)
+    {
+        // Tokenize RPN expression, and create a new stack for the result
+        $rpn_array = explode(' ', $expression);
+        $ifx_stack = new \SplStack();
+
+        // Iterate
+        foreach ($rpn_array as $rpn_symbol) {
+            if (is_numeric($rpn_symbol)) {
+                $ifx_stack->push($rpn_symbol);
+            } elseif ($ifx_stack->count() < 2) {
+                return 'Conversion error';
+            } else {
+                $x = $ifx_stack->pop();
+                $y = $ifx_stack->pop();
+                $ifx_stack->push("({$y} {$rpn_symbol} {$x})");
+            }
+        }
+
+        // Finished, return the top of the stack
+        return $ifx_stack->top();
     }
 }

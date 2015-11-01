@@ -33,16 +33,18 @@ class Solver
      */
     public function run()
     {
-        // Holds all successful equations
         $winners = [];
 
         // Generate the RPN expressions to allow brute force calculations
         $this->buildRpnEquations($this->numbers);
 
         // Carry out each calculation, recording the winners
-        foreach ($this->rpn_equations as $equation) {
-            if (Rpn::calculate($equation) === $this->target) {
-                $winners[] = $equation;
+        foreach ($this->rpn_equations as $rpn) {
+            if (Rpn::calculate($rpn) === $this->target) {
+                $winners[] = [
+                    'rpn' => $rpn,
+                    'ifx' => Rpn::ConvertRpnToStd($rpn),
+                ];
             }
         }
 
@@ -53,6 +55,7 @@ class Solver
 
     /**
     * Build RPN equation strings for all permutations of the source numbers
+    * (adapted from a Java example found at the URL below)
     * @link   http://stackoverflow.com/a/2394972
     * @param  Array $numbers
     * @param  int $level
@@ -79,7 +82,7 @@ class Solver
         }
 
         if ($all_used && $level == 1) {
-            $this->rpn_equations[] = $equation;
+            $this->rpn_equations[] = trim($equation);
         }
     }
 }

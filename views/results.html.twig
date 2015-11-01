@@ -15,22 +15,29 @@
 
 					<div class="well">
 
-						<h3>Target Result: {{ result.problem.target }}</h3>
-						<h3>Source Numbers: {{ result.problem.numbers_str }}</h3>
+						<p class="text-muted">Target Result: {{ result.problem.target }}</p>
+						<p class="text-muted">Source Numbers: {{ result.problem.numbers_str }}</p>
 
 						{% if result.expressions %}
 
-							<h3>Postfix</h3>
-							<ul>
+							<table class="table table-compact">
+								<tr>
+									<th>Postfix</th>
+									<th>Infix</th>
+								</tr>
 
 								{% for expression in result.expressions %}
-									<li>{{ expression }}</li>
+									<tr>
+										<td>{{ expression.rpn }}</td>
+										<td>{{ expression.ifx }}</td>
+									</tr>
 								{% endfor %}
-							</ul>
+
+							</table>
 
 						{% else %}
 
-							<h3 class="error">Unsolveable</h3>
+							<p class="alert-danger">Unsolveable</p>
 
 						{% endif %}
 
