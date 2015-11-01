@@ -42,6 +42,10 @@ class Solver
     }
 
 
+    /**
+     * Check/set the timeout
+     * @return boolean
+     */
     private function timeout()
     {
         // If timeout is null, set it
@@ -55,7 +59,7 @@ class Solver
             return true;
         }
 
-        // If timeout is running, check it, invalidate results if timeout occorred, return status
+        // If timeout is running, check it, invalidate results if timeout occurred, return status
         if ($this->timeout <= time()) {
             $this->timeout = true;
             $this->results = false;
