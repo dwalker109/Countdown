@@ -50,11 +50,6 @@ class Rpn
 
                 // eval() the result and push to the stack
                 $rpn_stack->push(eval("return {$y} {$e} {$x};"));
-
-                // Check if $target has been reached already - short circuit if so
-                if ($rpn_stack->top() === $target) {
-                    break;
-                }
             }
         }
 

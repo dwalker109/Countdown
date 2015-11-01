@@ -8,6 +8,7 @@ class Solver
     private $rpn_equations;
     private $results;
     private $max_matches;
+    private $timeout;
 
 
     public function __construct(Array $numbers, $target, $max_matches)
@@ -15,6 +16,8 @@ class Solver
         $this->numbers = $numbers;
         $this->target = $target;
         $this->max_matches = $max_matches;
+
+        $this->timeout = null;
         $this->rpn_equations = [];
         $this->results = [];
     }
@@ -34,8 +37,30 @@ class Solver
         $this->buildRpnExpressions($this->numbers);
         $this->calculateResults();
 
-        // Return the results
+        // Return the results, which will be boolean false if this timed out
         return $this->results;
+    }
+
+
+    private function timeout()
+    {
+        // If timeout is null, set it
+        if ($this->timeout === null) {
+            $this->timeout = strtotime('+30 seconds');
+            return false;
+        }
+
+        // Check whether timeout occurred
+        if ($this->timeout === true) {
+            return true;
+        }
+
+        // If timeout is running, check it, invalidate results if timeout occorred, return status
+        if ($this->timeout <= time()) {
+            $this->timeout = true;
+            $this->results = false;
+            return true;
+        }
     }
 
 
@@ -44,8 +69,13 @@ class Solver
      */
     private function calculateResults()
     {
-        // Iterate all available equations and store winners
         foreach ($this->rpn_equations as $rpn) {
+            // Check timeout
+            if ($this->timeout()) {
+                return;
+            }
+
+            // If this equation is a winner, store it
             if (Rpn::calculate($rpn) === $this->target) {
                 $this->results[] = [
                     'rpn' => $rpn,
@@ -72,6 +102,11 @@ class Solver
     */
     private function buildRpnExpressions(Array $numbers, $level = 0, $equation = null)
     {
+        // Check timeout
+        if ($this->timeout()) {
+            return;
+        }
+
         // At least two operands deep, so iterate and append each
         // operator to this tree in a recursive call to this method
         if ($level >= 2) {
